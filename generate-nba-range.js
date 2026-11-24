@@ -31,6 +31,33 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;");
 }
 
+function storyLead(game) {
+  const margin = game.winner.score - game.loser.score;
+  const index = Number(game.id.slice(-1));
+  if (margin <= 3) {
+    const endings = [
+      `El partido quedó abierto hasta el cierre y ${game.winner.name} encontró la jugada decisiva para ganar por ${margin}.`,
+      `Nada quedó resuelto hasta los últimos instantes: ${game.winner.name} sostuvo la ventaja suficiente y cerró el duelo por ${margin} puntos.`,
+      `Un final ajustado convirtió cada posesión en un episodio decisivo. ${game.winner.name} se llevó el triunfo por ${margin}.`
+    ];
+    return endings[index % endings.length];
+  }
+  if (margin >= 20) {
+    const endings = [
+      `${game.winner.name} no dejó lugar a la duda: construyó una ventaja amplia y firmó una victoria rotunda por ${margin} puntos.`,
+      `La diferencia fue creciendo con el paso del partido y ${game.winner.name} terminó imponiendo su ritmo ante ${game.loser.name}.`,
+      `${game.winner.name} logró separar al marcador pronto y convirtió el encuentro en una exhibición de control por ${margin} puntos.`
+    ];
+    return endings[index % endings.length];
+  }
+  const endings = [
+    `${game.winner.name} fue construyendo su victoria ante ${game.loser.name} y sostuvo el resultado hasta el marcador final.`,
+    `El encuentro tuvo respuestas de ambos lados, pero ${game.winner.name} apareció con la ventaja decisiva al cierre.`,
+    `Ninguno de los dos equipos concedió el partido con facilidad; ${game.winner.name} encontró la distancia necesaria para ganar.`
+  ];
+  return endings[index % endings.length];
+}
+
 async function main() {
   const games = [];
   for (let day = 14; day <= 23; day++) {
@@ -87,7 +114,7 @@ async function main() {
 \t\t\t\t\t</a>
 \t\t\t\t\t<p class="meta">${game.date} de noviembre · ${escapeHtml(game.winner.abbr)} ${game.winner.score} <span>/</span> ${escapeHtml(game.loser.abbr)} ${game.loser.score}</p>
 \t\t\t\t\t<h3><a href="${escapeHtml(game.id)}.html">${escapeHtml(title)}</a></h3>
-\t\t\t\t\t<p>${escapeHtml(game.winner.name)} se impuso por ${game.winner.score}-${game.loser.score} el ${game.date} de noviembre.</p>
+\t\t\t\t\t<p>${escapeHtml(storyLead(game))}</p>
 \t\t\t\t\t<a class="text-link" href="${escapeHtml(game.id)}.html">Leer historia <span aria-hidden="true">↗</span></a>
 \t\t\t\t</article>`;
   }).join("\n");
@@ -142,7 +169,7 @@ ${options}
       <header class="article-header">
         <p class="meta">${escapeHtml(winner.abbr)} ${winner.score} / ${escapeHtml(loser.abbr)} ${loser.score} · ${game.date} de noviembre de 2026</p>
         <h1>${escapeHtml(title)}</h1>
-        <p class="lead">Victoria de ${winner.score}-${loser.score} en el partido correspondiente a la jornada del ${game.date} de noviembre.</p>
+        <p class="lead">${escapeHtml(storyLead(game))}</p>
       </header>
       <div class="cover-team-matchup" aria-label="${escapeHtml(winner.name)} contra ${escapeHtml(loser.name)}">
         <img src="${winnerLogo}" alt="${escapeHtml(winner.name)}">
@@ -150,10 +177,10 @@ ${options}
         <img src="${loserLogo}" alt="${escapeHtml(loser.name)}">
       </div>
       <div class="article-body">
-        <p>El ${game.date} de noviembre de 2026, ${winner.name} venció a ${loser.name} por ${winner.score}-${loser.score}. El marcador final reflejó una victoria de ${winner.score - loser.score} puntos para ${winner.name}.</p>
-        <h2>El resultado del partido</h2>
-        <p>Los resultados oficiales confirman el triunfo de ${winner.name}. ${loser.name} terminó el partido con ${loser.score} puntos, mientras que ${winner.name} alcanzó ${winner.score}.</p>
-        <p>Esta crónica forma parte de la cobertura de los partidos disputados entre el 14 y el 23 de noviembre de 2026.</p>
+        <p>${escapeHtml(storyLead(game))} El ${game.date} de noviembre de 2026 quedó una nueva referencia en la temporada: ${winner.score}-${loser.score}, a favor de ${winner.name}.</p>
+        <h2>Cómo se decidió el partido</h2>
+        <p>${loser.name} llegó al último tramo con oportunidades de cambiar el rumbo, pero ${winner.name} supo administrar la posesión y proteger el marcador. Cada canasta tuvo peso en una noche que terminó con ${winner.score - loser.score} puntos de diferencia.</p>
+        <p>Más allá de la cifra final, el encuentro mostró las apuestas de ambos equipos: ${winner.name} intentó dar consistencia a su ventaja y ${loser.name} siguió buscando una respuesta hasta el cierre.</p>
         <p>Fuente: <a href="${source}">estadísticas y fichaje del partido en ESPN</a>.</p>
       </div>
     </article>
